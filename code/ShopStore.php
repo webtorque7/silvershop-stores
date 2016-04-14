@@ -46,7 +46,7 @@ class ShopStore extends DataObject
             CompositeField::create(
                 DropdownField::create('Country', 'Country', $this->config()->country_locale_mapping)
                     ->setEmptyString('Select the country this shop is open to'),
-                DropdownField::create('Currency', 'Currency', $this->config()->currencies)
+                DropdownField::create('Currency', 'Currency', array_combine(array_keys($this->config()->currencies), array_keys($this->config()->currencies)))
                     ->setEmptyString('Select the currency for product pricing')
             )->addExtraClass('cms-field-highlight'),
             TreeDropdownField::create('TermsPageID', 'Terms and Conditions Page', 'SiteTree'),
@@ -78,8 +78,8 @@ class ShopStore extends DataObject
 
     public function CurrencySymbol()
     {
-        $symbols = $this->config()->currency_symbols;
-        return ($this->Currency && isset($symbols[$this->Currency])) ? $symbols[$this->Currency] : '$';
+        $currencies = $this->config()->currencies;
+        return ($this->Currency && isset($currencies[$this->Currency])) ? $currencies[$this->Currency] : '$';
     }
 
     public function getCurrentConfig()

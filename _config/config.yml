@@ -4,12 +4,6 @@ Name: silvershop-stores
 ShopStore:
   currencies:
   #Add your currencies as necessary
-    - NZD
-    - AUD
-    - USD
-#    - RMB
-  currency_symbols:
-  #Add symbols for each currency as necessary
     NZD: '$'
     AUD: '$'
     USD: '$'
@@ -19,4 +13,4 @@ ShopStore:
     'NZ': "en_NZ"
     'AU': "en_AU"
     'US': "en_US"
-    'CN': "zh_CN"
+#    'CN': "zh_CN"
