@@ -10,8 +10,7 @@ class ShopStore extends DataObject
 {
     private static $db = array(
         'Country' => 'Varchar',
-        'Currency' => 'Varchar',
-        'AllowedCountries' => 'Text'
+        'Currency' => 'Varchar'
     );
 
     private static $has_one = array(
@@ -36,7 +35,6 @@ class ShopStore extends DataObject
             'Main',
             'Country',
             'Currency',
-            'AllowedCountries',
             'TermsPageID',
             'CustomerGroupID',
             'DefaultProductImage',
@@ -54,11 +52,6 @@ class ShopStore extends DataObject
             TreeDropdownField::create('TermsPageID', 'Terms and Conditions Page', 'SiteTree'),
             TreeDropdownField::create('CustomerGroupID', 'Group to add new customers to', 'Group'),
             UploadField::create('DefaultProductImage', 'Default Product Image')
-        ));
-
-        $fields->addFieldsToTab('Root.AllowedCountries', array(
-            CheckboxSetField::create('AllowedCountries', 'Allowed Ordering and Shipping Countries',
-                ShopConfig::config()->iso_3166_country_codes)
         ));
 
         if ($this->exists()) {
@@ -100,48 +93,6 @@ class ShopStore extends DataObject
             }
         }
 
-        return ShopStore::create();
-    }
-
-    /**
-     * Carried over from SilverShop Config
-     * @param bool|false $prefixisocode
-     * @return array|scalar
-     */
-    public function getCountriesList($prefixisocode = false)
-    {
-        $countries = ShopConfig::config()->iso_3166_country_codes;
-        asort($countries);
-        if ($allowed = $this->AllowedCountries) {
-            $allowed = explode(",", $allowed);
-            if (count($allowed > 0)) {
-                $countries = array_intersect_key($countries, array_flip($allowed));
-            }
-        }
-        if ($prefixisocode) {
-            foreach ($countries as $key => $value) {
-                $countries[$key] = "$key - $value";
-            }
-        }
-        return $countries;
-    }
-
-    /**
-     * Carried over from SilverShop Config
-     * @param bool|false $fullname
-     * @return mixed|null
-     */
-    public function getSingleCountry($fullname = false)
-    {
-        $countries = $this->getCountriesList();
-        if (count($countries) == 1) {
-            if ($fullname) {
-                return array_pop($countries);
-            } else {
-                reset($countries);
-                return key($countries);
-            }
-        }
-        return null;
+        return SiteConfig::current_site_config();
     }
 }
