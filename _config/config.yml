@@ -1,2 +1,16 @@
+---
+Name: silvershop-stores
+---
 ShopStore:
-  test: true
+  currencies:
+  #Add your currencies as necessary
+    - NZD
+    - AUD
+    - USD
+#    - RMB
+  currency_symbols:
+  #Add symbols for each currency as necessary
+    NZD: '$'
+    AUD: '$'
+    USD: '$'
+#    RMB: '¥'
