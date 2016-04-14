@@ -8,6 +8,9 @@
  */
 class ShopStore extends DataObject
 {
+    private static $singular_name = 'Store';
+    private static $plural_name = 'Stores';
+
     private static $db = array(
         'Country' => 'Varchar',
         'Currency' => 'Varchar'
@@ -25,6 +28,11 @@ class ShopStore extends DataObject
 
     private static $many_many = array(
         'Products' => 'Product'
+    );
+
+    private static $summary_fields = array(
+        'Country' => 'Country',
+        'Currency' => 'Currency'
     );
 
     public function getCMSFields()
