@@ -10,35 +10,55 @@ class ShopStore extends DataObject
 {
     private static $db = array(
         'Country' => 'Varchar',
-        'Currency' => 'Varchar'
+        'Currency' => 'Varchar',
+        'AllowedCountries' => 'Text'
     );
 
-    public static $has_one = array(
-        'ShopStoreConfig' => 'ShopStoreConfig'
+    private static $has_one = array(
+        'TermsPage' => 'SiteTree',
+        'CustomerGroup' => 'Group',
+        'DefaultProductImage' => 'Image'
     );
 
-    public static $has_many = array(
+    private static $has_many = array(
         'Orders' => 'Order',
     );
 
-    public static $many_many = array(
+    private static $many_many = array(
         'Products' => 'Product'
     );
 
     public function getCMSFields()
     {
+        Requirements::css(STORE_MODULE_DIR . "/css/store-cms.css");
         $fields = parent::getCMSFields();
-        $fields->removeByName(array('Country', 'Currency', 'Orders', 'Products'));
+        $fields->removeByName(array(
+            'Main',
+            'Country',
+            'Currency',
+            'AllowedCountries',
+            'TermsPageID',
+            'CustomerGroupID',
+            'DefaultProductImage',
+            'Orders',
+            'Products',
+        ));
 
-        $allowedCountries = SiteConfig::current_site_config()->getCountriesList();
-        $configuredCountries = $this->config()->country_locale_mapping;
-        $countryList = array_intersect($allowedCountries, $configuredCountries);
+        $fields->addFieldsToTab('Root.Settings', array(
+            CompositeField::create(
+                DropdownField::create('Country', 'Country', $this->config()->country_locale_mapping)
+                    ->setEmptyString('Select the country this shop is open to'),
+                DropdownField::create('Currency', 'Currency', $this->config()->currencies)
+                    ->setEmptyString('Select the currency for product pricing')
+            )->addExtraClass('cms-field-highlight'),
+            TreeDropdownField::create('TermsPageID', 'Terms and Conditions Page', 'SiteTree'),
+            TreeDropdownField::create('CustomerGroupID', 'Group to add new customers to', 'Group'),
+            UploadField::create('DefaultProductImage', 'Default Product Image')
+        ));
 
-        $fields->addFieldsToTab('Root.Main', array(
-            DropdownField::create('Country', 'Country', $countryList)
-                ->setEmptyString('Select the country this shop is open to'),
-            DropdownField::create('Currency', 'Currency', $this->config()->currencies)
-                ->setEmptyString('Select the currency for product pricing')
+        $fields->addFieldsToTab('Root.AllowedCountries', array(
+            CheckboxSetField::create('AllowedCountries', 'Allowed Ordering and Shipping Countries',
+                ShopConfig::config()->iso_3166_country_codes)
         ));
 
         if ($this->exists()) {
@@ -54,6 +74,7 @@ class ShopStore extends DataObject
             );
         }
 
+        $this->extend('updateCMSFields', $fields);
         return $fields;
     }
 
@@ -62,13 +83,65 @@ class ShopStore extends DataObject
         return RequiredFields::create('Country', 'Currency');
     }
 
-    public function Symbol()
+    public function CurrencySymbol()
     {
         $symbols = $this->config()->currency_symbols;
         return ($this->Currency && isset($symbols[$this->Currency])) ? $symbols[$this->Currency] : '$';
     }
 
-    public static function findStoreForLocale($locale){
+    public function getCurrentConfig()
+    {
+        if (class_exists('Fluent')) {
+            $locale = Fluent::current_locale();
+            $country = array_search($locale, $this->config()->country_locale_mapping);
+            $store = ShopStore::get()->filter(array('Country' => $country))->first();
+            if ($store->exists()) {
+                return $store;
+            }
+        }
 
+        return ShopStore::create();
+    }
+
+    /**
+     * Carried over from SilverShop Config
+     * @param bool|false $prefixisocode
+     * @return array|scalar
+     */
+    public function getCountriesList($prefixisocode = false)
+    {
+        $countries = ShopConfig::config()->iso_3166_country_codes;
+        asort($countries);
+        if ($allowed = $this->AllowedCountries) {
+            $allowed = explode(",", $allowed);
+            if (count($allowed > 0)) {
+                $countries = array_intersect_key($countries, array_flip($allowed));
+            }
+        }
+        if ($prefixisocode) {
+            foreach ($countries as $key => $value) {
+                $countries[$key] = "$key - $value";
+            }
+        }
+        return $countries;
+    }
+
+    /**
+     * Carried over from SilverShop Config
+     * @param bool|false $fullname
+     * @return mixed|null
+     */
+    public function getSingleCountry($fullname = false)
+    {
+        $countries = $this->getCountriesList();
+        if (count($countries) == 1) {
+            if ($fullname) {
+                return array_pop($countries);
+            } else {
+                reset($countries);
+                return key($countries);
+            }
+        }
+        return null;
     }
 }
