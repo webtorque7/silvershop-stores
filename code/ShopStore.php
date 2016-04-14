@@ -13,6 +13,10 @@ class ShopStore extends DataObject
         'Currency' => 'Varchar'
     );
 
+    public static $has_one = array(
+        'ShopStoreConfig' => 'ShopStoreConfig'
+    );
+
     public static $has_many = array(
         'Orders' => 'Order',
     );
@@ -25,10 +29,13 @@ class ShopStore extends DataObject
     {
         $fields = parent::getCMSFields();
         $fields->removeByName(array('Country', 'Currency', 'Orders', 'Products'));
+
         $allowedCountries = SiteConfig::current_site_config()->getCountriesList();
+        $configuredCountries = $this->config()->country_locale_mapping;
+        $countryList = array_intersect($allowedCountries, $configuredCountries);
 
         $fields->addFieldsToTab('Root.Main', array(
-            DropdownField::create('Country', 'Country', $allowedCountries)
+            DropdownField::create('Country', 'Country', $countryList)
                 ->setEmptyString('Select the country this shop is open to'),
             DropdownField::create('Currency', 'Currency', $this->config()->currencies)
                 ->setEmptyString('Select the currency for product pricing')
@@ -59,5 +66,9 @@ class ShopStore extends DataObject
     {
         $symbols = $this->config()->currency_symbols;
         return ($this->Currency && isset($symbols[$this->Currency])) ? $symbols[$this->Currency] : '$';
+    }
+
+    public static function findStoreForLocale($locale){
+
     }
 }

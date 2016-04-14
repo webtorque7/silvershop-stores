@@ -14,3 +14,9 @@ ShopStore:
     AUD: '$'
     USD: '$'
 #    RMB: '¥'
+  country_locale_mapping:
+  #add locale mapping for available countries, country codes must be compliant with iso 3166
+    'NZ': "en_NZ"
+    'AU': "en_AU"
+    'US': "en_US"
+    'CN': "zh_CN"
