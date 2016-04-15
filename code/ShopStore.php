@@ -13,7 +13,8 @@ class ShopStore extends DataObject
 
     private static $db = array(
         'Country' => 'Varchar',
-        'Currency' => 'Varchar'
+        'Currency' => 'Varchar',
+        'ShippingConfigID' => 'Int'
     );
 
     private static $has_one = array(
@@ -43,6 +44,7 @@ class ShopStore extends DataObject
             'Main',
             'Country',
             'Currency',
+            'ShippingConfigID',
             'TermsPageID',
             'CustomerGroupID',
             'DefaultProductImage',
@@ -52,10 +54,16 @@ class ShopStore extends DataObject
 
         $fields->addFieldsToTab('Root.Settings', array(
             CompositeField::create(
-                DropdownField::create('Country', 'Country', $this->config()->country_locale_mapping)
-                    ->setEmptyString('Select the country this shop is open to'),
-                DropdownField::create('Currency', 'Currency', array_combine(array_keys($this->config()->currencies), array_keys($this->config()->currencies)))
-                    ->setEmptyString('Select the currency for product pricing')
+                DropdownField::create(
+                    'Country',
+                    'Country',
+                    $this->config()->country_locale_mapping
+                )->setEmptyString('Select the country this shop is open to'),
+                DropdownField::create(
+                    'Currency',
+                    'Currency',
+                    array_combine(array_keys($this->config()->currencies), array_keys($this->config()->currencies))
+                )->setEmptyString('Select the currency for product pricing')
             )->addExtraClass('cms-field-highlight'),
             TreeDropdownField::create('TermsPageID', 'Terms and Conditions Page', 'SiteTree'),
             TreeDropdownField::create('CustomerGroupID', 'Group to add new customers to', 'Group'),
@@ -84,10 +92,41 @@ class ShopStore extends DataObject
         return RequiredFields::create('Country', 'Currency');
     }
 
+    public function requireDefaultRecords()
+    {
+        parent::requireDefaultRecords();
+        if (!DataObject::get_one('ShopStore')) {
+            $store = ShopStore::create();
+            $store->Country = $this->config()->default_country;
+            $store->Currency = $this->config()->default_currency;
+            $store->write();
+        }
+    }
+
+    public function canDelete($member = null)
+    {
+        return false;
+    }
+
+    public function onBeforeWrite()
+    {
+        parent::onBeforeWrite();
+        if(!$this->ShippingConfigID){
+            $shippingConfigClass = $this->config()->shipping_config_class;
+            if(class_exists($shippingConfigClass)){
+                $shippingConfig = Object::create($shippingConfigClass);
+                $shippingConfig->Country = $this->Country;
+                $shippingConfig->write();
+                $this->ShippingConfigID = $shippingConfig->ID;
+            }
+        }
+    }
+
     public function CurrencySymbol()
     {
+        $currency = $this->Currency ? $this->Currency : $this->config()->default_currency;
         $currencies = $this->config()->currencies;
-        return ($this->Currency && isset($currencies[$this->Currency])) ? $currencies[$this->Currency] : '$';
+        return $currencies[$currency];
     }
 
     public function getCurrentConfig()

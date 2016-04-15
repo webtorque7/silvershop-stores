@@ -14,3 +14,6 @@ ShopStore:
     'AU': "en_AU"
     'US': "en_US"
 #    'CN': "zh_CN"
+  default_country: 'NZ'
+  default_currency: 'NZD'
+  shipping_config_class: 'StoreShippingMatrixConfig'
