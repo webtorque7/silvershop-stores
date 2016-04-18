@@ -49,12 +49,12 @@ class ShopStore extends DataObject
                     'Country',
                     'Country',
                     array_combine(array_keys($this->config()->country_locale_mapping), array_keys($this->config()->country_locale_mapping))
-                )->setEmptyString('Select the country this shop is open to'),
+                )->setEmptyString('Select the country for this store'),
                 DropdownField::create(
                     'Currency',
                     'Currency',
                     array_combine(array_keys($this->config()->currencies), array_keys($this->config()->currencies))
-                )->setEmptyString('Select the currency for product pricing')
+                )->setEmptyString('Select the currency for this store')
             )->addExtraClass('cms-field-highlight'),
             UploadField::create('DefaultProductImage', 'Default Product Image'),
             TreeDropdownField::create('CustomerGroupID', 'New customer default group', 'Group'),
