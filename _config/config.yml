@@ -16,4 +16,5 @@ ShopStore:
 #    'CN': "zh_CN"
   default_country: 'NZ'
   default_currency: 'NZD'
-  shipping_config_class: 'StoreShippingMatrixConfig'
+  dependency_classes:
+  #add classes that needs to be setup when a store is created linked by country.

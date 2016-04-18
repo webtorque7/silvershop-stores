@@ -13,8 +13,7 @@ class ShopStore extends DataObject
 
     private static $db = array(
         'Country' => 'Varchar',
-        'Currency' => 'Varchar',
-        'ShippingConfigID' => 'Int'
+        'Currency' => 'Varchar'
     );
 
     private static $has_one = array(
@@ -44,7 +43,6 @@ class ShopStore extends DataObject
             'Main',
             'Country',
             'Currency',
-            'ShippingConfigID',
             'TermsPageID',
             'CustomerGroupID',
             'DefaultProductImage',
@@ -52,7 +50,7 @@ class ShopStore extends DataObject
             'Products',
         ));
 
-        $fields->addFieldsToTab('Root.Settings', array(
+        $fields->addFieldsToTab('Root.Settings.Main', array(
             CompositeField::create(
                 DropdownField::create(
                     'Country',
@@ -65,9 +63,12 @@ class ShopStore extends DataObject
                     array_combine(array_keys($this->config()->currencies), array_keys($this->config()->currencies))
                 )->setEmptyString('Select the currency for product pricing')
             )->addExtraClass('cms-field-highlight'),
-            TreeDropdownField::create('TermsPageID', 'Terms and Conditions Page', 'SiteTree'),
-            TreeDropdownField::create('CustomerGroupID', 'Group to add new customers to', 'Group'),
-            UploadField::create('DefaultProductImage', 'Default Product Image')
+            UploadField::create('DefaultProductImage', 'Default Product Image'),
+            TreeDropdownField::create('CustomerGroupID', 'New customer default group', 'Group'),
+        ));
+
+        $fields->addFieldsToTab('Root.Settings.Links', array(
+            TreeDropdownField::create('TermsPageID', 'Terms and Conditions Page', 'SiteTree')
         ));
 
         if ($this->exists()) {
@@ -111,13 +112,15 @@ class ShopStore extends DataObject
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        if(!$this->ShippingConfigID){
-            $shippingConfigClass = $this->config()->shipping_config_class;
-            if(class_exists($shippingConfigClass)){
-                $shippingConfig = Object::create($shippingConfigClass);
-                $shippingConfig->Country = $this->Country;
-                $shippingConfig->write();
-                $this->ShippingConfigID = $shippingConfig->ID;
+        $dependencyClasses = $this->config()->dependency_classes;
+        foreach($dependencyClasses as $class){
+            if(class_exists($class) && !empty($this->Country)){
+                $existingObjectForCountry = DataObject::get($class, "Country = '" . $this->Country . "'");
+                if(empty($existingObjectForCountry)){
+                    $object = Object::create($class);
+                    $object->Country = $this->Country;
+                    $object->write();
+                }
             }
         }
     }
