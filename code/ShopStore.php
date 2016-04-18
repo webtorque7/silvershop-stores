@@ -40,14 +40,7 @@ class ShopStore extends DataObject
         Requirements::css(STORE_MODULE_DIR . "/css/store-cms.css");
         $fields = parent::getCMSFields();
         $fields->removeByName(array(
-            'Main',
-            'Country',
-            'Currency',
-            'TermsPageID',
-            'CustomerGroupID',
-            'DefaultProductImage',
-            'Orders',
-            'Products',
+            'Main'
         ));
 
         $fields->addFieldsToTab('Root.Settings.Main', array(
@@ -55,7 +48,7 @@ class ShopStore extends DataObject
                 DropdownField::create(
                     'Country',
                     'Country',
-                    $this->config()->country_locale_mapping
+                    array_combine(array_keys($this->config()->country_locale_mapping), array_keys($this->config()->country_locale_mapping))
                 )->setEmptyString('Select the country this shop is open to'),
                 DropdownField::create(
                     'Currency',
@@ -116,7 +109,7 @@ class ShopStore extends DataObject
         foreach($dependencyClasses as $class){
             if(class_exists($class) && !empty($this->Country)){
                 $existingObjectForCountry = DataObject::get($class, "Country = '" . $this->Country . "'");
-                if(empty($existingObjectForCountry)){
+                if(empty($existingObjectForCountry->first())){
                     $object = Object::create($class);
                     $object->Country = $this->Country;
                     $object->write();
