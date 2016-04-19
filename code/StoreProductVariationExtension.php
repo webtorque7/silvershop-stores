@@ -1,12 +1,12 @@
 <?php
-
 /**
  * Created by PhpStorm.
  * User: User
  * Date: 19/04/2016
- * Time: 11:15 AM
+ * Time: 1:34 PM
  */
-class StoreProductExtension extends DataExtension
+
+class StoreProductVariationExtension extends DataExtension
 {
     private static $db = array();
 
@@ -26,9 +26,15 @@ class StoreProductExtension extends DataExtension
 
     public function updateSellingPrice($price){
         //TODO create json file to store and fetch these to improve performance
+        $price = $this->owner->Price;
         $storePrice = $this->owner->currentStorePrice();
         if($storePrice && $storePrice->exists()){
             $price = $storePrice->Price;
+        }
+
+        //price passed in does not check for store price so redo the check here
+        if ($price == 0 && ($parentProduct = $this->owner->Product())) {
+            $price = $parentProduct->sellingPrice();
         }
 
         return $price;
