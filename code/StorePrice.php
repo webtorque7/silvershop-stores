@@ -9,7 +9,8 @@
 class StorePrice extends DataObject
 {
     private static $db = array(
-        'Price' => 'Currency'
+        'Price' => 'Currency',
+        'Country' => 'Varchar'
     );
 
     private static $has_one = array(
@@ -18,14 +19,14 @@ class StorePrice extends DataObject
     );
 
     private static $summary_fields = array(
-        'Store.Country' => 'Country',
-        'Price' => 'Price'
+        'Store.Country' => 'Store',
+        'StorePriceString' => 'Price'
     );
 
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->removeByName(array('ProductID', 'Price'));
+        $fields->removeByName(array('ProductID', 'Price', 'Country'));
         $fields->addFieldsToTab('Root.Main', array(
             DropdownField::create('StoreID', 'Store', ShopStore::get()->map('ID', 'Country'))
                 ->setEmptyString('Select the store country'),
@@ -39,5 +40,25 @@ class StorePrice extends DataObject
     public function getCMSValidator()
     {
         return RequiredFields::create('Price', 'StoreID');
+    }
+
+    public function onBeforeWrite()
+    {
+        parent::onBeforeWrite();
+        $store = $this->Store();
+        if($store && $store->exists()){
+            $this->Country = $store->Country;
+        }
+    }
+
+    public function StorePriceString(){
+        $store = $this->Store();
+        $price = $this->Price;
+        if($store && $store->exists()){
+            $currency = $store->Currency;
+            $symbol = $store->CurrencySymbol();
+            $price = $symbol . $this->Price . ' ' . $currency;
+        }
+        return $price;
     }
 }
