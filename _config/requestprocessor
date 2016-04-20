@@ -1,0 +1,9 @@
+---
+Name: shopstorerequestprocessors
+After: fluentrequestprocessors
+---
+Injector:
+  RequestProcessor:
+    properties:
+      filters:
+        - '%$ShopStoreRequestFilter'

@@ -141,4 +141,8 @@ class ShopStore extends DataObject
             }
         }
     }
+
+    public static function current_store(){
+        return self::getCurrentConfig();
+    }
 }

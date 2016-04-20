@@ -4,3 +4,6 @@ Product:
 ProductVariation:
   extensions:
     - StoreProductVariationExtension
+Order:
+  extendions:
+    - StoreOrder
