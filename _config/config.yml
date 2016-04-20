@@ -1,6 +1,9 @@
 ---
 Name: silvershop-stores
 ---
+Discount:
+  constraints:
+    - StoreDiscountConstraint
 ShopStore:
   currencies:
   #Add your currencies as necessary

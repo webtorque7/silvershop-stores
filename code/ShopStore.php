@@ -24,6 +24,7 @@ class ShopStore extends DataObject
 
     private static $has_many = array(
         'Orders' => 'Order',
+        'Discounts' => 'Discount'
     );
 
     private static $many_many = array(
@@ -65,16 +66,20 @@ class ShopStore extends DataObject
         ));
 
         if ($this->exists()) {
-            $config = GridFieldConfig_RelationEditor::create();
-            $config->removeComponentsByType($config->getComponentByType('GridFieldAddNewButton'));
-
             $fields->addFieldToTab('Root.Orders',
-                GridField::create('Orders', 'Orders', $this->Orders(), $config)
+                GridField::create('Orders', 'Orders', $this->Orders(), $orderConfig = GridFieldConfig_RelationEditor::create())
             );
+            $orderConfig->removeComponentsByType($orderConfig->getComponentByType('GridFieldAddNewButton'));
 
             $fields->addFieldToTab('Root.Products',
-                GridField::create('Products', 'Products', $this->Products(), $config)
+                GridField::create('Products', 'Products', $this->Products(), $productConfig = GridFieldConfig_RelationEditor::create())
             );
+            $productConfig->removeComponentsByType($productConfig->getComponentByType('GridFieldAddNewButton'));
+
+            $fields->addFieldToTab('Root.Discounts',
+                GridField::create('Discounts', 'Discounts', $this->Discounts(), $discountConfig = GridFieldConfig_RelationEditor::create())
+            );
+            $discountConfig->removeComponentsByType($discountConfig->getComponentByType('GridFieldAddNewButton'));
         }
 
         $this->extend('updateCMSFields', $fields);
@@ -135,7 +140,5 @@ class ShopStore extends DataObject
                 return $store;
             }
         }
-
-        return SiteConfig::current_site_config();
     }
 }

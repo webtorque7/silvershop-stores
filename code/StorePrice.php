@@ -9,8 +9,7 @@
 class StorePrice extends DataObject
 {
     private static $db = array(
-        'Price' => 'Currency',
-        'Country' => 'Varchar'
+        'Price' => 'Currency'
     );
 
     private static $has_one = array(
@@ -40,15 +39,6 @@ class StorePrice extends DataObject
     public function getCMSValidator()
     {
         return RequiredFields::create('Price', 'StoreID');
-    }
-
-    public function onBeforeWrite()
-    {
-        parent::onBeforeWrite();
-        $store = $this->Store();
-        if($store && $store->exists()){
-            $this->Country = $store->Country;
-        }
     }
 
     public function StorePriceString(){

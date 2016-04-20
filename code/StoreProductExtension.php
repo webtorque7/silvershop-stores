@@ -19,9 +19,11 @@ class StoreProductExtension extends DataExtension
     }
 
     public function currentStorePrice(){
-        $currentCountry = $this->owner->currentCountryCode();
-        $storePrice = $this->owner->StorePrices()->filter(array('Country' => $currentCountry))->first();
-        return $storePrice;
+        $currentShop = ShopConfig::current();
+        if($currentShop && $currentShop->ClassName == 'ShopStore'){
+            $storePrice = $this->owner->StorePrices()->filter(array('StoreID' => $currentShop->ID))->first();
+            return $storePrice;
+        }
     }
 
     public function updateSellingPrice($price){
