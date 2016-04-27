@@ -19,7 +19,7 @@ class StorePrice extends DataObject
 
     private static $summary_fields = array(
         'Store.Title' => 'Store',
-//        'StorePriceString' => 'Price'
+        'Price' => 'Price'
     );
 
     public function getCMSFields()
@@ -40,13 +40,4 @@ class StorePrice extends DataObject
     {
         return RequiredFields::create('Price', 'StoreID');
     }
-
-//    public function StorePriceString(){
-//        $store = $this->Store();
-//        $price = $this->Price;
-//        if($store && $store->exists()){
-//           //TODO
-//        }
-//        return $price;
-//    }
 }

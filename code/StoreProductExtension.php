@@ -35,13 +35,4 @@ class StoreProductExtension extends DataExtension
 
         return $price;
     }
-
-//    public function getPriceString(){
-//        $storePrice = $this->owner->currentStorePrice();
-//        if($storePrice && $storePrice->exists()){
-//            //TODO
-//        }
-//
-//        return '$' . $this->owner->sellingPrice();
-//    }
 }
