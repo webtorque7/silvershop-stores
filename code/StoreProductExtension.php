@@ -15,7 +15,7 @@ class StoreProductExtension extends DataExtension
     );
 
     public function updateCMSFields(FieldList $fields) {
-        $fields->addFieldToTab('Root.Pricing', GridField::create('StorePrices', 'Store Prices', $this->owner->StorePrices(), GridFieldConfig_RelationEditor::create()));
+        $fields->addFieldToTab('Root.Pricing', StorePriceField::create('StorePrices', 'Store Prices', ShopStore::get()));
     }
 
     public function currentStorePrice(){

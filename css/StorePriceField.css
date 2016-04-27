@@ -1,0 +1,21 @@
+.StorePriceField .shop-store {
+    margin-bottom: 20px;
+}
+
+.StorePriceField .store-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.StorePriceField .store-currency-list li {
+    margin-bottom: 10px;
+    width: 200px;
+}
+
+.StorePriceField .store-currency-list li label{
+    vertical-align: middle;
+}
+
+.StorePriceField .store-currency-list li input{
+    float: right;
+}

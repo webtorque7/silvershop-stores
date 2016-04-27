@@ -9,7 +9,8 @@
 class StorePrice extends DataObject
 {
     private static $db = array(
-        'Price' => 'Currency'
+        'Price' => 'Currency',
+        'Currency' => 'Varchar'
     );
 
     private static $has_one = array(
@@ -17,27 +18,21 @@ class StorePrice extends DataObject
         'Store' => 'ShopStore'
     );
 
-    private static $summary_fields = array(
-        'Store.Title' => 'Store',
-        'Price' => 'Price'
-    );
+    public static function findOrCreate($storeID, $productID, $currency){
+        $price = StorePrice::get()->filter(array(
+            'StoreID' => $storeID,
+            'ProductID' => $productID,
+            'Currency' => $currency
+        ))->first();
 
-    public function getCMSFields()
-    {
-        $fields = parent::getCMSFields();
-        $fields->removeByName(array('ProductID', 'StoreID', 'Price'));
-        $fields->addFieldsToTab('Root.Main', array(
-            DropdownField::create('StoreID', 'Store', ShopStore::get()->map('ID', 'Country'))
-                ->setEmptyString('Select the store'),
-            TextField::create('Price', 'Store Price')
-                ->setDescription('Base price to sell this product at this store.')
-                ->setMaxLength(12)
-        ));
-        return $fields;
-    }
+        if(empty($price)){
+            $price = StorePrice::create();
+            $price->StoreID = $storeID;
+            $price->ProductID = $productID;
+            $price->Currency = $currency;
+            $price->write();
+        }
 
-    public function getCMSValidator()
-    {
-        return RequiredFields::create('Price', 'StoreID');
+        return $price;
     }
 }
