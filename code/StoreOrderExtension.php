@@ -13,16 +13,13 @@ class StoreOrder extends DataExtension
     );
 
     public function onStartOrder(){
-        if (class_exists('Fluent')) {
-            $locale = Fluent::current_locale();
-            $store = ShopStore::current_store();
-            if ($store && $store->exists()) {
-                $this->StoreID = $store->ID;
-                $this->write();
-            }
+        $store = ShopStore::current_store();
+        if ($store && $store->exists()) {
+            $this->owner->StoreID = $store->ID;
+            $this->write();
 
             // save it to my session
-            Session::set('shoppingcartid_' . $locale, $this->ID);
+            Session::set('shoppingcartid_' . $store->ID, $this->ID);
         }
     }
 }

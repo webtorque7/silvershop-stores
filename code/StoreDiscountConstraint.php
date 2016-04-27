@@ -15,7 +15,7 @@ class StoreDiscountConstraint extends DiscountConstraint
     public function updateCMSFields(FieldList $fields) {
         if($this->owner->isInDB()){
             $fields->addFieldToTab("Root.Main.Constraints.Main",
-                DropdownField::create('StoreID', 'Store', ShopStore::get()->map('ID', 'Country'))
+                DropdownField::create('StoreID', 'Store', ShopStore::get()->map())
                     ->setEmptyString('Select the store this discount can be applied to')
             );
         }
@@ -26,9 +26,9 @@ class StoreDiscountConstraint extends DiscountConstraint
             return true;
         }
 
-        $currentShop = ShopConfig::current();
-        if($currentShop && $currentShop->ClassName == 'ShopStore'){
-            if($currentShop->ID == $this->StoreID){
+        $currentShop = ShopStore::current_store();
+        if($currentShop && $currentShop->exists()){
+            if($this->StoreID == $currentShop->ID){
                 return true;
             }
             else{

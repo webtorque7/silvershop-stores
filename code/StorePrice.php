@@ -18,17 +18,17 @@ class StorePrice extends DataObject
     );
 
     private static $summary_fields = array(
-        'Store.Country' => 'Store',
-        'StorePriceString' => 'Price'
+        'Store.Title' => 'Store',
+//        'StorePriceString' => 'Price'
     );
 
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->removeByName(array('ProductID', 'Price', 'Country'));
+        $fields->removeByName(array('ProductID', 'StoreID', 'Price'));
         $fields->addFieldsToTab('Root.Main', array(
             DropdownField::create('StoreID', 'Store', ShopStore::get()->map('ID', 'Country'))
-                ->setEmptyString('Select the store country'),
+                ->setEmptyString('Select the store'),
             TextField::create('Price', 'Store Price')
                 ->setDescription('Base price to sell this product at this store.')
                 ->setMaxLength(12)
@@ -41,14 +41,12 @@ class StorePrice extends DataObject
         return RequiredFields::create('Price', 'StoreID');
     }
 
-    public function StorePriceString(){
-        $store = $this->Store();
-        $price = $this->Price;
-        if($store && $store->exists()){
-            $currency = $store->Currency;
-            $symbol = $store->CurrencySymbol();
-            $price = $symbol . $this->Price . ' ' . $currency;
-        }
-        return $price;
-    }
+//    public function StorePriceString(){
+//        $store = $this->Store();
+//        $price = $this->Price;
+//        if($store && $store->exists()){
+//           //TODO
+//        }
+//        return $price;
+//    }
 }

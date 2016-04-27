@@ -19,8 +19,8 @@ class StoreProductVariationExtension extends DataExtension
     }
 
     public function currentStorePrice(){
-        $currentShop = ShopConfig::current();
-        if($currentShop && $currentShop->ClassName == 'ShopStore'){
+        $currentShop = ShopStore::current_store();
+        if($currentShop && $currentShop->exists()){
             $storePrice = $this->owner->StorePrices()->filter(array('StoreID' => $currentShop->ID))->first();
             return $storePrice;
         }
@@ -42,12 +42,12 @@ class StoreProductVariationExtension extends DataExtension
         return $price;
     }
 
-    public function getPriceString(){
-        $storePrice = $this->owner->currentStorePrice();
-        if($storePrice && $storePrice->exists()){
-            return $storePrice->StorePriceString();
-        }
-
-        return '$' . $this->owner->sellingPrice();
-    }
+//    public function getPriceString(){
+//        $storePrice = $this->owner->currentStorePrice();
+//        if($storePrice && $storePrice->exists()){
+//            //TODO
+//        }
+//
+//        return '$' . $this->owner->sellingPrice();
+//    }
 }

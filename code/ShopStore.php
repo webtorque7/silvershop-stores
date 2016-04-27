@@ -11,7 +11,9 @@ class ShopStore extends DataObject
     private static $singular_name = 'Store';
     private static $plural_name = 'Stores';
 
-    private static $db = array();
+    private static $db = array(
+        'Title' => 'Varchar(200)'
+    );
 
     private static $has_one = array(
         'TermsPage' => 'SiteTree',
@@ -26,7 +28,7 @@ class ShopStore extends DataObject
     );
 
     private static $summary_fields = array(
-        'AllCountryString' => 'Store Countries',
+        'Title' => 'Title',
     );
 
     public function getCMSFields()
@@ -35,14 +37,19 @@ class ShopStore extends DataObject
         $fields->removeByName(array('Main', 'StoreCountries'));
 
         $fields->addFieldsToTab('Root.Settings.Main', array(
-            GridField::create('StoreCountries', 'Store Countries', $this->StoreCountries(),
-                $countryGrid = GridFieldConfig_RelationEditor::create()),
+            TextField::create('Title', 'Title'),
+            GridField::create(
+                'StoreCountries',
+                'Store Countries',
+                $this->StoreCountries(),
+                GridFieldConfig_RelationEditor::create()
+                    ->removeComponentsByType('GridFieldAddExistingAutocompleter')
+                    ->removeComponentsByType('GridFieldDeleteAction')
+                    ->addComponent(new GridFieldDeleteAction(false))
+            ),
             UploadField::create('DefaultProductImage', 'Default Product Image'),
             TreeDropdownField::create('CustomerGroupID', 'New customer default group', 'Group'),
         ));
-        $countryGrid->removeComponentsByType('GridFieldAddExistingAutocompleter')
-            ->removeComponentsByType('GridFieldDeleteAction')
-            ->addComponent(new GridFieldDeleteAction(false));
 
         $fields->addFieldsToTab('Root.Settings.Links', array(
             TreeDropdownField::create('TermsPageID', 'Terms and Conditions Page', 'SiteTree')
@@ -58,20 +65,6 @@ class ShopStore extends DataObject
 
         $this->extend('updateCMSFields', $fields);
         return $fields;
-    }
-
-    public function AllCountryString()
-    {
-        $countries = array();
-        foreach ($this->StoreCountries() as $country) {
-            array_push($countries, $country->Country);
-        }
-        return implode(', ', $countries);
-    }
-
-    public function getCMSValidator()
-    {
-        return RequiredFields::create('Country', 'Currency', 'Symbol');
     }
 
     public function requireDefaultRecords()
@@ -101,14 +94,22 @@ class ShopStore extends DataObject
         parent::onBeforeWrite();
         $dependencyClasses = $this->config()->dependency_classes;
         foreach ($dependencyClasses as $class) {
-            if (class_exists($class) && !empty($this->Country)) {
-                $existingObjectForCountry = DataObject::get($class, "Country = '" . $this->Country . "'");
-                if (empty($existingObjectForCountry->first())) {
+            if (class_exists($class)) {
+                $existingObjectForStore = DataObject::get($class, "ShopStoreID = '" . $this->ID . "'")->first();
+                if (empty($existingObjectForStore)) {
                     $object = Object::create($class);
-                    $object->Country = $this->Country;
+                    $object->ShopStoreID = $this->ID;
                     $object->write();
                 }
             }
+        }
+
+        if(!$this->Title){
+            $countries = array();
+            foreach ($this->StoreCountries() as $country) {
+                array_push($countries, $country->Country);
+            }
+            $this->Title = 'Store - ' . implode(', ', $countries);
         }
     }
 
