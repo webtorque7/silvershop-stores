@@ -11,10 +11,7 @@ class ShopStore extends DataObject
     private static $singular_name = 'Store';
     private static $plural_name = 'Stores';
 
-    private static $db = array(
-        'Country' => 'Varchar',
-        'Currency' => 'Varchar'
-    );
+    private static $db = array();
 
     private static $has_one = array(
         'TermsPage' => 'SiteTree',
@@ -23,61 +20,38 @@ class ShopStore extends DataObject
     );
 
     private static $has_many = array(
+        'StoreCountries' => 'StoreCountry',
         'Orders' => 'Order',
         'Discounts' => 'Discount'
     );
 
-    private static $many_many = array(
-        'Products' => 'Product'
-    );
-
     private static $summary_fields = array(
-        'Country' => 'Country',
-        'Currency' => 'Currency'
+        'AllCountryString' => 'Store Countries',
     );
 
     public function getCMSFields()
     {
-        Requirements::css(STORE_MODULE_DIR . "/css/store-cms.css");
         $fields = parent::getCMSFields();
-        $fields->removeByName(array(
-            'Main'
-        ));
+        $fields->removeByName(array('Main', 'StoreCountries'));
 
         $fields->addFieldsToTab('Root.Settings.Main', array(
-            CompositeField::create(
-                DropdownField::create(
-                    'Country',
-                    'Country',
-                    array_combine(array_keys($this->config()->country_locale_mapping), array_keys($this->config()->country_locale_mapping))
-                )->setEmptyString('Select the country for this store'),
-                DropdownField::create(
-                    'Currency',
-                    'Currency',
-                    array_combine(array_keys($this->config()->currencies), array_keys($this->config()->currencies))
-                )->setEmptyString('Select the currency for this store')
-            )->addExtraClass('cms-field-highlight'),
+            GridField::create('StoreCountries', 'Store Countries', $this->StoreCountries(),
+                $countryGrid = GridFieldConfig_RelationEditor::create()),
             UploadField::create('DefaultProductImage', 'Default Product Image'),
             TreeDropdownField::create('CustomerGroupID', 'New customer default group', 'Group'),
         ));
+        $countryGrid->removeComponentsByType('GridFieldAddExistingAutocompleter')
+            ->removeComponentsByType('GridFieldDeleteAction')
+            ->addComponent(new GridFieldDeleteAction(false));
 
         $fields->addFieldsToTab('Root.Settings.Links', array(
             TreeDropdownField::create('TermsPageID', 'Terms and Conditions Page', 'SiteTree')
         ));
 
         if ($this->exists()) {
-            $fields->addFieldToTab('Root.Orders',
-                GridField::create('Orders', 'Orders', $this->Orders(), $orderConfig = GridFieldConfig_RelationEditor::create())
-            );
-            $orderConfig->removeComponentsByType($orderConfig->getComponentByType('GridFieldAddNewButton'));
-
-            $fields->addFieldToTab('Root.Products',
-                GridField::create('Products', 'Products', $this->Products(), $productConfig = GridFieldConfig_RelationEditor::create())
-            );
-            $productConfig->removeComponentsByType($productConfig->getComponentByType('GridFieldAddNewButton'));
-
             $fields->addFieldToTab('Root.Discounts',
-                GridField::create('Discounts', 'Discounts', $this->Discounts(), $discountConfig = GridFieldConfig_RelationEditor::create())
+                GridField::create('Discounts', 'Discounts', $this->Discounts(),
+                    $discountConfig = GridFieldConfig_RelationEditor::create())
             );
             $discountConfig->removeComponentsByType($discountConfig->getComponentByType('GridFieldAddNewButton'));
         }
@@ -86,19 +60,34 @@ class ShopStore extends DataObject
         return $fields;
     }
 
+    public function AllCountryString()
+    {
+        $countries = array();
+        foreach ($this->StoreCountries() as $country) {
+            array_push($countries, $country->Country);
+        }
+        return implode(', ', $countries);
+    }
+
     public function getCMSValidator()
     {
-        return RequiredFields::create('Country', 'Currency');
+        return RequiredFields::create('Country', 'Currency', 'Symbol');
     }
 
     public function requireDefaultRecords()
     {
         parent::requireDefaultRecords();
         if (!DataObject::get_one('ShopStore')) {
+            //create default store
             $store = ShopStore::create();
-            $store->Country = $this->config()->default_country;
-            $store->Currency = $this->config()->default_currency;
             $store->write();
+
+            //use default country and currency for default store
+            $country = StoreCountry::create();
+            $country->Country = $this->config()->default_country;
+            $country->write();
+
+            $store->StoreCountries()->add($country);
         }
     }
 
@@ -111,10 +100,10 @@ class ShopStore extends DataObject
     {
         parent::onBeforeWrite();
         $dependencyClasses = $this->config()->dependency_classes;
-        foreach($dependencyClasses as $class){
-            if(class_exists($class) && !empty($this->Country)){
+        foreach ($dependencyClasses as $class) {
+            if (class_exists($class) && !empty($this->Country)) {
                 $existingObjectForCountry = DataObject::get($class, "Country = '" . $this->Country . "'");
-                if(empty($existingObjectForCountry->first())){
+                if (empty($existingObjectForCountry->first())) {
                     $object = Object::create($class);
                     $object->Country = $this->Country;
                     $object->write();
@@ -123,26 +112,25 @@ class ShopStore extends DataObject
         }
     }
 
-    public function CurrencySymbol()
+    public function CurrentStoreCountry()
     {
-        $currency = $this->Currency ? $this->Currency : $this->config()->default_currency;
-        $currencies = $this->config()->currencies;
-        return $currencies[$currency];
+        $locale = Fluent::current_locale();
+        $country = array_search($locale, $this->config()->country_locale_mapping);
+        return StoreCountry::get()->filter(array('Country' => $country))->first();
     }
 
     public function getCurrentConfig()
     {
         if (class_exists('Fluent')) {
-            $locale = Fluent::current_locale();
-            $country = array_search($locale, $this->config()->country_locale_mapping);
-            $store = ShopStore::get()->filter(array('Country' => $country))->first();
-            if ($store && $store->exists()) {
-                return $store;
+            $storeCountry = $this->CurrentStoreCountry();
+            if (!empty($storeCountry) && $storeCountry->ShopStoreID) {
+                return $storeCountry->ShopStore();
             }
         }
     }
 
-    public static function current_store(){
+    public static function current_store()
+    {
         return self::getCurrentConfig();
     }
 }

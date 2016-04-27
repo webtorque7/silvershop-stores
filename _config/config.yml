@@ -5,12 +5,6 @@ Discount:
   constraints:
     - StoreDiscountConstraint
 ShopStore:
-  currencies:
-  #Add your currencies as necessary
-    NZD: '$'
-    AUD: '$'
-    USD: '$'
-#    RMB: '¥'
   country_locale_mapping:
   #add locale mapping for available countries, country codes must be compliant with iso 3166
     'NZ': "en_NZ"
@@ -18,6 +12,5 @@ ShopStore:
     'US': "en_US"
 #    'CN': "zh_CN"
   default_country: 'NZ'
-  default_currency: 'NZD'
   dependency_classes:
   #add classes that needs to be setup when a store is created linked by country.

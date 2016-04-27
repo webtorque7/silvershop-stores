@@ -5,5 +5,5 @@ ProductVariation:
   extensions:
     - StoreProductVariationExtension
 Order:
-  extendions:
+  extensions:
     - StoreOrder
