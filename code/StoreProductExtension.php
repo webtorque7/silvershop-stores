@@ -19,7 +19,7 @@ class StoreProductExtension extends DataExtension
     }
 
     public function currentStorePrice(){
-        $currentShop = ShopStore::current_store();
+        $currentShop = ShopStore::current();
         if($currentShop && $currentShop->exists()){
             $storePrice = $this->owner->StorePrices()->filter(array('StoreID' => $currentShop->ID))->first();
             return $storePrice;

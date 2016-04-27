@@ -26,7 +26,7 @@ class StoreDiscountConstraint extends DiscountConstraint
             return true;
         }
 
-        $currentShop = ShopStore::current_store();
+        $currentShop = ShopStore::current();
         if($currentShop && $currentShop->exists()){
             if($this->StoreID == $currentShop->ID){
                 return true;

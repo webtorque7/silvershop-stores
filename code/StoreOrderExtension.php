@@ -13,7 +13,7 @@ class StoreOrder extends DataExtension
     );
 
     public function onStartOrder(){
-        $store = ShopStore::current_store();
+        $store = ShopStore::current();
         if ($store && $store->exists()) {
             $this->owner->StoreID = $store->ID;
             $this->write();

@@ -130,7 +130,7 @@ class ShopStore extends DataObject
         }
     }
 
-    public static function current_store()
+    public static function current()
     {
         return self::getCurrentConfig();
     }

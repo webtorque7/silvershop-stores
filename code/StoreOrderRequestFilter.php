@@ -7,7 +7,7 @@ class ShopStoreRequestFilter implements RequestFilter
      */
     public function preRequest(SS_HTTPRequest $request, Session $session, DataModel $model)
     {
-        $store = ShopStore::current_store();
+        $store = ShopStore::current();
 
         if($store && $store->exists() && $memberID = Member::currentUserID()){
             // check in my session first
