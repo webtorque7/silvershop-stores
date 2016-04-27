@@ -18,20 +18,24 @@ class StoreProductVariationExtension extends DataExtension
         $fields->addFieldToTab('Root.Pricing', GridField::create('StorePrices', 'Store Prices', $this->owner->StorePrices(), GridFieldConfig_RelationEditor::create()));
     }
 
-    public function currentStorePrice(){
-        $currentShop = ShopStore::current();
-        if($currentShop && $currentShop->exists()){
-            $storePrice = $this->owner->StorePrices()->filter(array('StoreID' => $currentShop->ID))->first();
-            return $storePrice;
+    public function findLocalPrice(){
+        $currentStore = ShopStore::current();
+        if($currentStore && $currentStore->exists()){
+            $StoreCountry = $currentStore->CurrentStoreCountry();
+
+            if($StoreCountry && $StoreCountry->exists()){
+                $localPrice = StorePrice::findOrCreate($currentStore->ID, $this->owner->ID, $StoreCountry->Currency);
+                return $localPrice;
+            }
         }
     }
 
     public function updateSellingPrice($price){
         //TODO create json file to store and fetch these to improve performance
         $price = $this->owner->Price;
-        $storePrice = $this->owner->currentStorePrice();
-        if($storePrice && $storePrice->exists()){
-            $price = $storePrice->Price;
+        $localPrice = $this->owner->findLocalPrice();
+        if($localPrice && $localPrice->exists()){
+            $price = $localPrice->Price;
         }
 
         //price passed in does not check for store price so redo the check here

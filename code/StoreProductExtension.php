@@ -18,19 +18,23 @@ class StoreProductExtension extends DataExtension
         $fields->addFieldToTab('Root.Pricing', StorePriceField::create('StorePrices', 'Store Prices', ShopStore::get()));
     }
 
-    public function currentStorePrice(){
-        $currentShop = ShopStore::current();
-        if($currentShop && $currentShop->exists()){
-            $storePrice = $this->owner->StorePrices()->filter(array('StoreID' => $currentShop->ID))->first();
-            return $storePrice;
+    public function findLocalPrice(){
+        $currentStore = ShopStore::current();
+        if($currentStore && $currentStore->exists()){
+            $StoreCountry = $currentStore->CurrentStoreCountry();
+
+            if($StoreCountry && $StoreCountry->exists()){
+                $localPrice = StorePrice::findOrCreate($currentStore->ID, $this->owner->ID, $StoreCountry->Currency);
+                return $localPrice;
+            }
         }
     }
 
     public function updateSellingPrice($price){
         //TODO create json file to store and fetch these to improve performance
-        $storePrice = $this->owner->currentStorePrice();
-        if($storePrice && $storePrice->exists()){
-            $price = $storePrice->Price;
+        $localPrice = $this->owner->findLocalPrice();
+        if($localPrice && $localPrice->exists()){
+            $price = $localPrice->Price;
         }
 
         return $price;
