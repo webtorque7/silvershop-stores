@@ -42,7 +42,5 @@ class StoreProductVariationExtension extends DataExtension
         if ($price == 0 && ($parentProduct = $this->owner->Product())) {
             $price = $parentProduct->sellingPrice();
         }
-
-        return $price;
     }
 }

@@ -136,21 +136,11 @@ class ShopStore extends DataObject
         }
     }
 
-    public static function CurrentStoreCountry()
-    {
-        $locale = Fluent::current_locale();
-        $country = array_search($locale, self::config()->country_locale_mapping);
-        return StoreCountry::get()->filter(array('Country' => $country))->first();
-    }
-
     public static function getCurrentConfig()
     {
-        if (class_exists('Fluent')) {
-            $storeCountry = Self::CurrentStoreCountry();
-            if (!empty($storeCountry) && $storeCountry->ShopStoreID) {
-                return $storeCountry->ShopStore();
-            }
-        }
+        $store = ShopStore::get()->first();
+        singleton('ShopStore')->extend('updateCurrentConfig', $store);
+        return $store;
     }
 
     public static function current()

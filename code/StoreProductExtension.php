@@ -36,7 +36,5 @@ class StoreProductExtension extends DataExtension
         if($localPrice && $localPrice->exists()){
             $price = $localPrice->Price;
         }
-
-        return $price;
     }
 }
