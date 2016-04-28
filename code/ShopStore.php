@@ -34,7 +34,7 @@ class ShopStore extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->removeByName(array('Main', 'StoreCountries'));
+        $fields->removeByName(array('Main', 'Orders', 'Discounts', 'StoreCountries'));
 
         $fields->addFieldsToTab('Root.Settings.Main', array(
             TextField::create('Title', 'Title')
@@ -58,12 +58,6 @@ class ShopStore extends DataObject
                     ->removeComponentsByType('GridFieldDeleteAction')
                     ->addComponent(new GridFieldDeleteAction(false))
             ), 'DefaultProductImage');
-
-            $fields->addFieldToTab('Root.Discounts',
-                GridField::create('Discounts', 'Discounts', $this->Discounts(),
-                    $discountConfig = GridFieldConfig_RelationEditor::create())
-            );
-            $discountConfig->removeComponentsByType($discountConfig->getComponentByType('GridFieldAddNewButton'));
         }
         else{
             $fields->addFieldToTab(
