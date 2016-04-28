@@ -30,7 +30,7 @@ class StoreProductVariationExtension extends DataExtension
         }
     }
 
-    public function updateSellingPrice($price){
+    public function updateSellingPrice(&$price){
         //TODO create json file to store and fetch these to improve performance
         $price = $this->owner->Price;
         $localPrice = $this->owner->findLocalPrice();
