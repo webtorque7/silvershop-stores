@@ -37,10 +37,16 @@ class StoreCountry extends DataObject
                 'Country',
                 array_combine(array_keys(ShopStore::config()->country_locale_mapping), array_keys(ShopStore::config()->country_locale_mapping))
             ),
-            TextField::create('Symbol', 'Symbol'),
             TextField::create('Currency', 'Currency')
+                ->setDescription('Please use a ISO4217 currency code.'),
+            TextField::create('Symbol', 'Symbol')
+                ->setDEscription('If you are unsure about the Currency and Symbol fields save them as blank and the system will try and find the default currency code and symbol for the country selected.'),
         ));
         return $fields;
+    }
+
+    public function getCMSValidator() {
+        return RequiredFields::create('Country');
     }
 
     public function onBeforeWrite()
