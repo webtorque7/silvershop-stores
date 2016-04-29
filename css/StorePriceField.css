@@ -1,5 +1,6 @@
 .StorePriceField .shop-store {
     margin-bottom: 20px;
+    width: 200px;
 }
 
 .StorePriceField .store-title {
@@ -9,7 +10,6 @@
 
 .StorePriceField .store-currency-list li {
     margin-bottom: 10px;
-    width: 200px;
 }
 
 .StorePriceField .store-currency-list li label{

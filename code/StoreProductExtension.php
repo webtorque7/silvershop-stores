@@ -11,11 +11,17 @@ class StoreProductExtension extends DataExtension
     private static $db = array();
 
     private static $has_many = array(
-        'StorePrices' => 'StorePrice'
+        'StorePrices' => 'StorePrice',
+        'StoreProductStocks' => 'StoreProductStock'
+    );
+
+    private static $many_many = array(
+        'Warehouses' => 'Warehouse'
     );
 
     public function updateCMSFields(FieldList $fields) {
-        $fields->addFieldToTab('Root.Pricing', StorePriceField::create('StorePrices', 'Store Prices', ShopStore::get()));
+        $fields->addFieldToTab('Root.Pricing', StorePriceField::create('StorePrices', 'Store Prices'));
+        $fields->addFieldToTab('Root.Inventory', StoreStockField::create('StoreProductStocks', 'Warehouse Stocks'));
     }
 
     public function findLocalPrice(){

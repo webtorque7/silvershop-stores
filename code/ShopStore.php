@@ -18,7 +18,8 @@ class ShopStore extends DataObject
     private static $has_one = array(
         'TermsPage' => 'SiteTree',
         'CustomerGroup' => 'Group',
-        'DefaultProductImage' => 'Image'
+        'DefaultProductImage' => 'Image',
+        'StoreWarehouse' => 'StoreWarehouse'
     );
 
     private static $has_many = array(
@@ -40,6 +41,7 @@ class ShopStore extends DataObject
             TextField::create('Title', 'Title')
                 ->setDescription('please give a meaningful name for this store so it can be refered to throughout the CMS.
                 <br>You can generate a default title by saving the field as blank after adding its countries. eg. Store - NZ'),
+            DropdownField::create('StoreWarehouseID', 'Store Warehouse', StoreWarehouse::get()->Map()),
             UploadField::create('DefaultProductImage', 'Default Product Image'),
             TreeDropdownField::create('CustomerGroupID', 'New customer default group', 'Group'),
         ));
@@ -57,14 +59,14 @@ class ShopStore extends DataObject
                     ->removeComponentsByType('GridFieldAddExistingAutocompleter')
                     ->removeComponentsByType('GridFieldDeleteAction')
                     ->addComponent(new GridFieldDeleteAction(false))
-            ), 'DefaultProductImage');
+            ), 'StoreWarehouseID');
         }
         else{
             $fields->addFieldToTab(
                 'Root.Settings.Main',
                 LiteralField::create('SaveReminder',
                 '<p class="message">Please save before adding the countries this store is open to.</p>'
-                ), 'DefaultProductImage');
+                ), 'StoreWarehouseID');
         }
 
         $this->extend('updateCMSFields', $fields);

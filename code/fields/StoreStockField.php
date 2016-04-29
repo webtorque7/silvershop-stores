@@ -6,7 +6,7 @@
  * Date: 27/04/2016
  * Time: 4:46 PM
  */
-class StorePriceField extends FormField
+class StoreStockField extends FormField
 {
     protected $relationship;
 
@@ -18,7 +18,7 @@ class StorePriceField extends FormField
 
     public function Field($properties = array())
     {
-        Requirements::css(STORE_MODULE_DIR . '/css/StorePriceField.css');
+        Requirements::css(STORE_MODULE_DIR . '/css/StoreStockField.css');
 
         $attributes = array_merge($this->getAttributes(), $properties);
         if ($this->form && $this->form->getRecord()) {
@@ -26,28 +26,22 @@ class StorePriceField extends FormField
             $record = $this->form->getRecord();
             if ($record->hasMethod($this->relationship)) {
 
-                $storeData = ArrayList::create();
+                $warehouseData = ArrayList::create();
                 $stores = ShopStore::get();
                 foreach ($stores as $store) {
-                    $storeArray = array('StoreTitle' => $store->Title, 'StoreID' => $store->ID);
+                    $warehouse = $store->StoreWarehouse();
+                    if($warehouse && $warehouse->exists()){
 
-                    $currencyData = ArrayList::create();
-                    foreach ($store->StoreCountries() as $countryData) {
+                        $storeProductStock = StoreProductStock::findOrCreate($warehouse->ID, $record->ID);
 
-                        $storePrice = StorePrice::findOrCreate($store->ID, $record->ID, $countryData->Currency);
-
-                        $currencyData->push(ArrayData::create(array(
-                            'Country' => $countryData->Country,
-                            'Currency' => $countryData->Currency,
-                            'Price' => $storePrice->Price
+                        $warehouseData->push(ArrayData::create(array(
+                            'WarehouseTitle' => $warehouse->Title,
+                            'WarehouseID' => $warehouse->ID,
+                            'Stock' => $storeProductStock->Stock
                         )));
                     }
-
-                    $storeArray['Currencies'] = $currencyData;
-
-                    $storeData->push(ArrayData::create($storeArray));
                 }
-                $attributes['Stores'] = $storeData;
+                $attributes['Warehouses'] = $warehouseData;
             }
         }
 
@@ -65,12 +59,10 @@ class StorePriceField extends FormField
             $relation = $record->hasMethod($name) ? $record->$name() : null;
             if ($relation && ($relation instanceof RelationList || $relation instanceof UnsavedRelationList)) {
                 if (is_array($this->value)) {
-                    foreach ($this->value as $storeID => $value) {
-                        foreach ($value as $currency => $price) {
-                            $storePrice = StorePrice::findOrCreate($storeID, $record->ID, $currency);
-                            $storePrice->Price = $price;
-                            $storePrice->write();
-                        }
+                    foreach ($this->value as $warehouseID => $stock) {
+                        $storeProductStock = StoreProductStock::findOrCreate($warehouseID, $record->ID);
+                        $storeProductStock->Stock = $stock;
+                        $storeProductStock->write();
                     }
                 }
             }

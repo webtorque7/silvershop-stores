@@ -14,6 +14,9 @@ class ShopStoreAdmin extends ModelAdmin
         'ShopStore' => array(
             'title' => 'Stores'
         ),
+        'StoreWarehouse' => array(
+            'title' => 'Warehouses'
+        ),
         'Order' => array(
             'title' => 'Orders'
         ),
