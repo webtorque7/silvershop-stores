@@ -32,7 +32,7 @@ class StoreStockField extends FormField
                     $warehouse = $store->StoreWarehouse();
                     if($warehouse && $warehouse->exists()){
 
-                        $storeProductStock = StoreProductStock::findOrCreate($warehouse->ID, $record->ID);
+                        $storeProductStock = StoreProductStock::findOrCreate($warehouse->ID, $record);
 
                         $warehouseData->push(ArrayData::create(array(
                             'WarehouseTitle' => $warehouse->Title,
@@ -60,7 +60,7 @@ class StoreStockField extends FormField
             if ($relation && ($relation instanceof RelationList || $relation instanceof UnsavedRelationList)) {
                 if (is_array($this->value)) {
                     foreach ($this->value as $warehouseID => $stock) {
-                        $storeProductStock = StoreProductStock::findOrCreate($warehouseID, $record->ID);
+                        $storeProductStock = StoreProductStock::findOrCreate($warehouseID, $record);
                         $storeProductStock->Stock = $stock;
                         $storeProductStock->write();
                     }

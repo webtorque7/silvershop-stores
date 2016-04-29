@@ -14,19 +14,25 @@ class StoreProductStock extends DataObject
 
     private static $has_one = array(
         'Product' => 'Product',
+        'ProductVariation' => 'ProductVariation',
         'StoreWarehouse' => 'StoreWarehouse'
     );
 
-    public static function findOrCreate($warehouseID, $productID){
+    public static function findOrCreate($warehouseID, $item){
+        $idField = 'ProductID';
+        if($item->ClassName == 'ProductVariation'){
+            $idField = 'ProductVariationID';
+        }
+
         $productStock = StoreProductStock::get()->filter(array(
             'StoreWarehouseID' => $warehouseID,
-            'ProductID' => $productID
+            $idField => $item->ID
         ))->first();
 
         if(empty($productStock)){
             $productStock = StoreProductStock::create();
             $productStock->StoreWarehouseID = $warehouseID;
-            $productStock->ProductID = $productID;
+            $productStock->$idField = $item->ID;
             $productStock->write();
         }
 

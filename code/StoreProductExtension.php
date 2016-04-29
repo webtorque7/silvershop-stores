@@ -15,13 +15,28 @@ class StoreProductExtension extends DataExtension
         'StoreProductStocks' => 'StoreProductStock'
     );
 
-    private static $many_many = array(
-        'Warehouses' => 'Warehouse'
-    );
-
     public function updateCMSFields(FieldList $fields) {
-        $fields->addFieldToTab('Root.Pricing', StorePriceField::create('StorePrices', 'Store Prices'));
-        $fields->addFieldToTab('Root.Inventory', StoreStockField::create('StoreProductStocks', 'Warehouse Stocks'));
+        if($this->owner->Variations()->exists()){
+            $fields->removeByName(array('StorePrices', 'StoreProductStocks'));
+            $fields->addFieldToTab('Root.Pricing',new LabelField('VariationPrice','Store Prices - Because you have one or more variations, the prices can be set in the "Variations" tab.'));
+            $fields->addFieldToTab('Root.Inventory',new LabelField('VariationStock','Warehouse Stocks - Because you have one or more variations, the stocks can be set in the "Variations" tab.'));
+        }
+        else{
+            $fields->addFieldToTab('Root.Pricing', StorePriceField::create('StorePrices', 'Store Prices'));
+            $fields->addFieldToTab('Root.Inventory', StoreStockField::create('StoreProductStocks', 'Warehouse Stocks'));
+        }
+    }
+
+    public function findLocalStock(){
+        $currentStore = ShopStore::current();
+        if($currentStore && $currentStore->exists()){
+            $warehouse = $currentStore->StoreWarehouse();
+
+            if($warehouse && $warehouse->exists()){
+                $localStock = StoreProductStock::findOrCreate($warehouse->ID, $this->owner->ID);
+                return $localStock;
+            }
+        }
     }
 
     public function findLocalPrice(){
