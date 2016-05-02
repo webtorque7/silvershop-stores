@@ -65,7 +65,7 @@ class ShopStore extends DataObject
             $fields->addFieldToTab(
                 'Root.Settings.Main',
                 LiteralField::create('SaveReminder',
-                '<p class="message">Please save before adding the countries this store is open to.</p>'
+                '<p class="warning">Please save before adding the countries this store is open to.</p>'
                 ), 'StoreWarehouseID');
         }
 
