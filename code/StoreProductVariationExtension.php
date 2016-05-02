@@ -11,25 +11,11 @@ class StoreProductVariationExtension extends DataExtension
     private static $db = array();
 
     private static $has_many = array(
-        'StorePrices' => 'StorePrice',
-        'StoreProductStocks' => 'StoreProductStock'
+        'StorePrices' => 'StorePrice'
     );
 
     public function updateCMSFields(FieldList $fields) {
         $fields->addFieldToTab('Root.Pricing', StorePriceField::create('StorePrices', 'Store Prices'));
-        $fields->addFieldToTab('Root.Inventory', StoreStockField::create('StoreProductStocks', 'Warehouse Stocks'));
-    }
-
-    public function findLocalStock(){
-        $currentStore = ShopStore::current();
-        if($currentStore && $currentStore->exists()){
-            $warehouse = $currentStore->StoreWarehouse();
-
-            if($warehouse && $warehouse->exists()){
-                $localStock = StoreProductStock::findOrCreate($warehouse->ID, $this->owner->ID);
-                return $localStock;
-            }
-        }
     }
 
     public function findLocalPrice(){
