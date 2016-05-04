@@ -115,7 +115,7 @@ class ShopStoreAdmin extends ModelAdmin
 
     public function getExportFields()
     {
-        if ($this->modelClass === 'WineClubOrder') {
+        if ($this->modelClass === 'Order') {
             $fields = array(
                 'Reference' => 'Reference',
                 'FormattedDate' => 'Placed',
