@@ -1,6 +1,6 @@
 ---
 Name: shopstorerequestprocessors
-After: fluentrequestprocessors
+Before: '#fluentrequestprocessors'
 ---
 Injector:
   RequestProcessor:

@@ -144,7 +144,7 @@ class ShopStoreAdmin extends ModelAdmin
                     'Country' => 'Country',
                     'HearAboutUs' => 'HearAboutUs',
                     'GroupList' => 'Groups',
-                    'getMemberType' => "MemberType",
+                    'MemberType.Type' => "MemberType",
                     'QuarterlyBottles' => 'QuarterlyBottles',
                     'NumOfShipmentMonths' => 'NumOfShipmentMonths',
                     'WineClubShipmentMonths' => 'WineClubShipmentMonths',
