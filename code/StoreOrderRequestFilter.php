@@ -8,7 +8,7 @@ class ShopStoreRequestFilter implements RequestFilter
      */
     public function preRequest(SS_HTTPRequest $request, Session $session, DataModel $model)
     {
-        if (Fluent::is_frontend(true)) {
+        if (Fluent::is_frontend(true) && !Director::is_cli()) {
             $store = $this->findCurrentStore($request);
             if ($store && $store->exists()) {
                 $sessionKey = $this->session_prefix . $store->ID;
