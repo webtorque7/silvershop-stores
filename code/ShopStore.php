@@ -82,13 +82,6 @@ class ShopStore extends DataObject
             $store = ShopStore::create();
             $store->Title = 'Store - ' . $defaultCountry;
             $store->write();
-
-            //use default country and currency for default store
-            $country = StoreCountry::create();
-            $country->Country = $defaultCountry;
-            $country->write();
-
-            $store->StoreCountries()->add($country);
         }
     }
 

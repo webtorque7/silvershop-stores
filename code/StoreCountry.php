@@ -49,6 +49,18 @@ class StoreCountry extends DataObject
         return RequiredFields::create('Country');
     }
 
+    public function requireDefaultRecords()
+    {
+        parent::requireDefaultRecords();
+        if (!DataObject::get_one('ShopStore')) {
+            $defaultCountry = $this->config()->default_country;
+            //create default store country
+            $country = StoreCountry::create();
+            $country->Country = $defaultCountry;
+            $country->write();
+        }
+    }
+
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
