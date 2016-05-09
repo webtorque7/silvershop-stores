@@ -10,6 +10,7 @@ class ShopStoreRequestFilter implements RequestFilter
     {
         if (Fluent::is_frontend(true) && !Director::is_cli()) {
             $store = $this->findCurrentStore($request);
+
             if ($store && $store->exists()) {
                 $sessionKey = $this->session_prefix . $store->ID;
                 ShoppingCart::$cartid_session_name = $sessionKey;
@@ -20,11 +21,19 @@ class ShopStoreRequestFilter implements RequestFilter
     /**
      * workaround because Fluent::current_locale relies on a controller and this is before controllers are setup.
      */
-    public function findCurrentStore($request)
+    public function findCurrentStore(SS_HTTPRequest $request)
     {
         $url = $request->getURL();
         $parts = explode('/', $url);
-        $alias = isset($parts[0]) ? $parts[0] : null;
+
+        $alias = '';
+
+        if ($request->getVar('l')) {
+            $alias = $request->getVar('l');
+        }
+        else {
+            $alias = isset($parts[0]) ? $parts[0] : '';
+        }
 
 //        $locale = array_search($alias, Fluent::config()->aliases);
 //        $country = array_search($locale, ShopStore::config()->country_locale_mapping);
