@@ -88,19 +88,6 @@ class ShopStore extends DataObject
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        $dependencyClasses = $this->config()->dependency_classes;
-        foreach ($dependencyClasses as $class) {
-            if (class_exists($class)) {
-                $existingObjectForStore = DataObject::get($class, "ShopStoreID = '" . $this->ID . "'")->first();
-                if (empty($existingObjectForStore)) {
-                    $object = Object::create($class);
-                    $object->ShopStoreID = $this->ID;
-                    $object->Title = $this->Title . ' - ' . $class;
-                    $object->write();
-                }
-            }
-        }
-
         if (!$this->Title) {
             $countries = array();
             foreach ($this->StoreCountries() as $country) {
@@ -108,6 +95,29 @@ class ShopStore extends DataObject
             }
             if (!empty($countries)) {
                 $this->Title = 'Store - ' . implode(', ', $countries);
+            }
+        }
+
+        if($this->exists()){
+            $this->createRelatedObjects();
+        }
+    }
+
+    public function createRelatedObjects(){
+        $dependencyClasses = $this->config()->dependency_classes;
+        foreach ($dependencyClasses as $class) {
+            if (class_exists($class)) {
+                $object = DataObject::get($class, "ShopStoreID = '" . $this->ID . "'")->first();
+                if (empty($object)) {
+                    $object = Object::create($class);
+                    $object->ShopStoreID = $this->ID;
+                    $object->write();
+                }
+
+                if($this->isChanged('Title')){
+                    $object->Title = $this->Title . ' - ' . $class;
+                    $object->write();
+                }
             }
         }
     }
@@ -123,6 +133,16 @@ class ShopStore extends DataObject
         $countries = $this->StoreCountries();
         foreach ($countries as $country) {
             $country->delete();
+        }
+
+        $dependencyClasses = $this->config()->dependency_classes;
+        foreach ($dependencyClasses as $class) {
+            if (class_exists($class)) {
+                $object = DataObject::get($class, "ShopStoreID = '" . $this->ID . "'")->first();
+                if($object && $object->exists()){
+                    $object->delete();
+                }
+            }
         }
     }
 
