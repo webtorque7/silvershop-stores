@@ -95,6 +95,7 @@ class ShopStore extends DataObject
                 if (empty($existingObjectForStore)) {
                     $object = Object::create($class);
                     $object->ShopStoreID = $this->ID;
+                    $object->Title = $this->Title . ' - ' . $class;
                     $object->write();
                 }
             }
@@ -113,7 +114,7 @@ class ShopStore extends DataObject
 
     public function canDelete($member = null)
     {
-        return false;
+        return Director::isLive() ? false : true;
     }
 
     public function onBeforeDelete()
