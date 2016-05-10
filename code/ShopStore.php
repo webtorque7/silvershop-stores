@@ -38,7 +38,7 @@ class ShopStore extends DataObject
         $fields->removeByName(array('Main', 'Orders', 'Discounts', 'StoreCountries'));
 
         $fields->addFieldsToTab('Root.Settings.Main', array(
-            TextField::create('Title', 'Title')
+            TextField::create('Title', 'Shop Name')
                 ->setDescription('please give a meaningful name for this store so it can be refered to throughout the CMS.
                 <br>You can generate a default title by saving the field as blank after adding its countries. eg. Store - NZ'),
             DropdownField::create('StoreWarehouseID', 'Store Warehouse', StoreWarehouse::get()->Map()),
