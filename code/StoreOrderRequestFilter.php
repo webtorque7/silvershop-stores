@@ -9,20 +9,17 @@ class ShopStoreRequestFilter implements RequestFilter
     public function preRequest(SS_HTTPRequest $request, Session $session, DataModel $model)
     {
         if (Fluent::is_frontend(true) && !Director::is_cli()) {
-            $store = $this->findCurrentStore($request);
+            $locale = $this->getLocale($request);
+            $store = $this->findCurrentStore($locale);
 
             if ($store && $store->exists()) {
-                $sessionKey = $this->session_prefix . $store->ID;
+                $sessionKey = $this->session_prefix . $store->ID . '-' . $locale;
                 ShoppingCart::$cartid_session_name = $sessionKey;
             }
         }
     }
 
-    /**
-     * workaround because Fluent::current_locale relies on a controller and this is before controllers are setup.
-     */
-    public function findCurrentStore(SS_HTTPRequest $request)
-    {
+    public function getLocale(SS_HTTPRequest $request){
         $url = $request->getURL();
         $parts = explode('/', $url);
 
@@ -35,14 +32,23 @@ class ShopStoreRequestFilter implements RequestFilter
             $alias = isset($parts[0]) ? $parts[0] : '';
         }
 
-//        $locale = array_search($alias, Fluent::config()->aliases);
-//        $country = array_search($locale, ShopStore::config()->country_locale_mapping);
+        $locale = array_search($alias, Fluent::config()->aliases);
 
-        $country = strtoupper($alias); //alias of a locale should be the country code in lowercase
+        return $locale;
+    }
 
-        $storeCountry = StoreCountry::get()->filter(array('Country' => $country))->first();
-        if (!empty($storeCountry) && $storeCountry->ShopStoreID) {
-            return $storeCountry->ShopStore();
+    /**
+     * workaround because Fluent::current_locale relies on a controller and this is before controllers are setup.
+     */
+    public function findCurrentStore($locale)
+    {
+        $country = array_search($locale, ShopStore::config()->country_locale_mapping);
+
+        if($country){
+            $storeCountry = StoreCountry::get()->filter(array('Country' => $country))->first();
+            if (!empty($storeCountry) && $storeCountry->ShopStoreID) {
+                return $storeCountry->ShopStore();
+            }
         }
     }
 
