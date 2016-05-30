@@ -24,15 +24,16 @@ class ShopStoreRequestFilter implements RequestFilter
         $parts = explode('/', $url);
 
         $alias = '';
+        $locale = '';
 
         if ($request->getVar('l')) {
             $alias = $request->getVar('l');
+            $locale = array_search($alias, Fluent::config()->locales);
         }
         else {
             $alias = isset($parts[0]) ? $parts[0] : '';
+            $locale = array_search($alias, Fluent::config()->aliases);
         }
-
-        $locale = array_search($alias, Fluent::config()->aliases);
 
         return $locale;
     }
