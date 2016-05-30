@@ -23,12 +23,10 @@ class ShopStoreRequestFilter implements RequestFilter
         $url = $request->getURL();
         $parts = explode('/', $url);
 
-        $alias = '';
         $locale = '';
 
         if ($request->getVar('l')) {
-            $alias = $request->getVar('l');
-            $locale = array_search($alias, Fluent::config()->locales);
+            $locale = $request->getVar('l');
         }
         else {
             $alias = isset($parts[0]) ? $parts[0] : '';
