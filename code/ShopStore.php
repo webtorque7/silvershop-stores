@@ -41,7 +41,7 @@ class ShopStore extends DataObject
             TextField::create('Title', 'Shop Name')
                 ->setDescription('please give a meaningful name for this store so it can be refered to throughout the CMS.
                 <br>You can generate a default title by saving the field as blank after adding its countries. eg. Store - NZ'),
-            DropdownField::create('StoreWarehouseID', 'Store Warehouse', StoreWarehouse::get()->Map()),
+            DropdownField::create('StoreWarehouseID', 'Store Warehouse', StoreWarehouse::get()->Map())->setEmptyString('Select Warehouse'),
             UploadField::create('DefaultProductImage', 'Default Product Image'),
             TreeDropdownField::create('CustomerGroupID', 'New customer default group', 'Group'),
         ));
