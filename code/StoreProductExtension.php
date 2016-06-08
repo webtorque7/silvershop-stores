@@ -25,12 +25,15 @@ class StoreProductExtension extends DataExtension
     }
 
     public function findLocalPrice(){
-        $currentStore = ShopStore::current();
-        if($currentStore && $currentStore->exists()){
-            $StoreCountry = $currentStore->CurrentStoreCountry();
+        // user see price in the store determined by geoip and not the store currently on
+//        $shopCountry = singleton('ShopStore')->CurrentStoreCountry();
 
-            if($StoreCountry && $StoreCountry->exists()){
-                $localPrice = StorePrice::findOrCreate($currentStore->ID, $this->owner->ID, $StoreCountry->Currency);
+        $userShopCountry = $this->owner->ShopCountry();
+        if($userShopCountry && $userShopCountry->exists()){
+            $userStore = $userShopCountry->ShopStore();
+
+            if($userStore && $userStore->exists()){
+                $localPrice = StorePrice::findOrCreate($userStore->ID, $this->owner->ID, $userShopCountry->Currency);
                 return $localPrice;
             }
         }
