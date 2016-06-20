@@ -9,6 +9,7 @@
 class StoreOrderExtension extends DataExtension
 {
     private static $has_one = array(
-        'Store' => 'ShopStore'
+        'Store' => 'ShopStore',
+        'StoreCountry' => 'StoreCountry'
     );
 }
