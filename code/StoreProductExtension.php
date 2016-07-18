@@ -33,7 +33,7 @@ class StoreProductExtension extends DataExtension
             $userStore = $userShopCountry->ShopStore();
 
             if($userStore && $userStore->exists()){
-                $localPrice = StorePrice::findOrCreate($userStore->ID, $this->owner->ID, $userShopCountry->Currency);
+                $localPrice = StorePrice::findOrCreate($userStore->ID, $this->owner, $userShopCountry->Currency);
                 return $localPrice;
             }
         }

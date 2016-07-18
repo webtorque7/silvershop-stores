@@ -15,7 +15,9 @@ class StoreProductVariationExtension extends DataExtension
     );
 
     public function updateCMSFields(FieldList $fields) {
-        $fields->addFieldToTab('Root.Pricing', StorePriceField::create('StorePrices', 'Store Prices'));
+        $fields->removeByName('Price');
+        $fields->push(StorePriceField::create('StorePrices', 'Store Prices'));
+//        $fields->addFieldToTab('Root.Pricing', StorePriceField::create('StorePrices', 'Store Prices'));
     }
 
     public function findLocalPrice(){
@@ -24,7 +26,7 @@ class StoreProductVariationExtension extends DataExtension
             $StoreCountry = $currentStore->CurrentStoreCountry();
 
             if($StoreCountry && $StoreCountry->exists()){
-                $localPrice = StorePrice::findOrCreate($currentStore->ID, $this->owner->ID, $StoreCountry->Currency);
+                $localPrice = StorePrice::findOrCreate($currentStore->ID, $this->owner, $StoreCountry->Currency);
                 return $localPrice;
             }
         }

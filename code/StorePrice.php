@@ -15,22 +15,40 @@ class StorePrice extends DataObject
 
     private static $has_one = array(
         'Product' => 'Product',
+        'ProductVariation' => 'ProductVariation',
         'Store' => 'ShopStore'
     );
 
-    public static function findOrCreate($storeID, $productID, $currency){
-        $price = StorePrice::get()->filter(array(
-            'StoreID' => $storeID,
-            'ProductID' => $productID,
-            'Currency' => $currency
-        ))->first();
+    public static function findOrCreate($storeID, $product, $currency){
+        if($product->ClassName == 'ProductVariation'){
+            $price = StorePrice::get()->filter(array(
+                'StoreID' => $storeID,
+                'ProductVariationID' => $product->ID,
+                'Currency' => $currency
+            ))->first();
 
-        if(empty($price)){
-            $price = StorePrice::create();
-            $price->StoreID = $storeID;
-            $price->ProductID = $productID;
-            $price->Currency = $currency;
-            $price->write();
+            if(empty($price)){
+                $price = StorePrice::create();
+                $price->StoreID = $storeID;
+                $price->ProductVariationID = $product->ID;
+                $price->Currency = $currency;
+                $price->write();
+            }
+        }
+        else{
+            $price = StorePrice::get()->filter(array(
+                'StoreID' => $storeID,
+                'ProductID' => $product->ID,
+                'Currency' => $currency
+            ))->first();
+
+            if(empty($price)){
+                $price = StorePrice::create();
+                $price->StoreID = $storeID;
+                $price->ProductID = $product->ID;
+                $price->Currency = $currency;
+                $price->write();
+            }
         }
 
         return $price;

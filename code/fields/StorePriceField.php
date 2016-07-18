@@ -34,7 +34,7 @@ class StorePriceField extends FormField
                     $currencyData = ArrayList::create();
                     foreach ($store->StoreCountries() as $countryData) {
 
-                        $storePrice = StorePrice::findOrCreate($store->ID, $record->ID, $countryData->Currency);
+                        $storePrice = StorePrice::findOrCreate($store->ID, $record, $countryData->Currency);
 
                         $currencyData->push(ArrayData::create(array(
                             'Country' => $countryData->Country,
@@ -67,7 +67,7 @@ class StorePriceField extends FormField
                 if (is_array($this->value)) {
                     foreach ($this->value as $storeID => $value) {
                         foreach ($value as $currency => $price) {
-                            $storePrice = StorePrice::findOrCreate($storeID, $record->ID, $currency);
+                            $storePrice = StorePrice::findOrCreate($storeID, $record, $currency);
                             $storePrice->Price = $price;
                             $storePrice->write();
                         }
